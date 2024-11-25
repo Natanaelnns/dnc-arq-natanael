@@ -49,3 +49,8 @@
     color: #666;
     pointer-events: none;
 }
+
+/* TRANSPARENT */
+.button.transparent {
+   background-color: transparent;
+}

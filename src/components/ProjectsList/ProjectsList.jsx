@@ -1,13 +1,30 @@
 import "./ProjectsList.css";
 import LikeFilled from "../../assets/like-filled.svg"
-import Like from "../../assets/like.svg"
+import LikeOutLine from "../../assets/like.svg"
 import { getApiData } from "../../services/ApiServices";
-import { useState, useEffect } from "react";
-import Button from "../../components/Button/Button";
+import { useState, useEffect, useContext  } from "react";
+import { AppContext } from "../Context/AppContext";
+import Button from "../Button/Button";
 
 export default function ProjectsList() {
 
   const [projects, setProjects] = useState([])
+  const appContext =  useContext(AppContext)
+  const [faveProject, setFaveProject] = useState([])
+
+
+  const handleSavedProjects = (id) => {
+    setFaveProject((prevFavProject) => {
+      if(prevFavProject.includes(id)) {
+        const filterArray = prevFavProject.filter((projectId) => projectId !== id)
+        sessionStorage.setItem('favProjects', JSON.stringify(filterArray))
+        return prevFavProject.filter((projectId) => projectId !== id)
+      } else {
+        sessionStorage.setItem('favProjects', JSON.stringify([...prevFavProject, id]))
+        return [...prevFavProject, id]
+      }
+    })
+  }
 
   useEffect(() => {
     const fechData = async () => {
@@ -23,16 +40,20 @@ export default function ProjectsList() {
   }, [])
 
 
-  function changeLike(){
+  useEffect(() => {
 
-  }
+    const savedFavProjects = JSON.parse(sessionStorage.getItem('favProjects'))
+    if(savedFavProjects) {
+      setFaveProject(savedFavProjects)
+    } 
+  }, [])
+
   return (
     <div className="projects-section">
       <div className="projects-hero">
-        <h2>Follow Our Projects</h2>
+        <h2>{appContext.languages[appContext.language].projects.title}</h2>
         <p>
-          It is a long established fact that a reader will be distracted by the
-          of readable content of page lookings at its layouts points.
+        {appContext.languages[appContext.language].projects.subtitle}
         </p>
       </div>
       <div className="projects-grid">
@@ -42,9 +63,9 @@ export default function ProjectsList() {
               <div className="thumb tertiary-background" style={{backgroundImage: `url(${project.thumb})`}}></div>
                 <h3>{project.title}</h3>
                 <p>{project.subtitle}</p>
-                {/* <Button onClick={changeLike} > */}
-                  <img src={LikeFilled} height="20px"/>
-                {/* </Button> */}
+                <Button buttonStyle="transparent" onClick={() => handleSavedProjects(project.id)}>
+                  <img src={faveProject.includes(project.id) ? LikeFilled : LikeOutLine} height="20px"/>
+                </Button>
             </div>
           ))
           :

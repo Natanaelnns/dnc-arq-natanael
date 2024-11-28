@@ -4,9 +4,16 @@ import About from './pages/About'
 import Projects from './pages/Projects'
 import Contact from './pages/Contact'
 import ScrollToTop from './utils/ScrollToTop'
+import { useContext } from 'react'
+import { AppContext } from './components/Context/AppContext'
+import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner'
 
 function App() {
+  const appContext = useContext(AppContext)
 
+  if(appContext.loading) {
+    return <LoadingSpinner />
+  }
   return (
     <>
       <Router>
